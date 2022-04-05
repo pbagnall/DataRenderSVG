@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1176px" height="1200px" viewBox="0 0 1176 1200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="template">
+    <g id="DataRow" spacing="0, 53">
+        <rect id="Col7" fill="#00518A" x="1128" y="6" width="48" height="12"></rect>
+        <rect id="Col6" fill="#00518A" x="968" y="6" width="48" height="12"></rect>
+        <rect id="Col5" fill="#00518A" x="808" y="6" width="48" height="12"></rect>
+        <rect id="Col4" fill="#00518A" x="648" y="6" width="48" height="12"></rect>
+        <rect id="Col3" fill="#00518A" x="488" y="6" width="32" height="12"></rect>
+        <rect id="Col2" fill="#00518A" x="328" y="6" width="48" height="12"></rect>
+        <rect id="Number" fill="#146615" fill-rule="nonzero" x="148" y="0" width="44" height="24" rx="4"></rect>
+        <text id="NumberText" x="199.296875" y="18" text-anchor='end' fill="#000000" fill-rule="nonzero" font-family="OpenSans, Open Sans" font-size="16" font-weight="normal">Number</text>
+        <text id="Label" text-decoration="underline" x="20" y="18" font-family="OpenSans, Open Sans" font-size="16" font-weight="normal" line-spacing="16" fill="#01518A">Label</text>
+    </g>
+    </g>
+</svg>
