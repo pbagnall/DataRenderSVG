@@ -1,20 +1,29 @@
 /* description: Parses and executes mathematical expressions. */
 
 /* lexical grammar */
-/*
-
-*/
 
 %lex
+%s QUOTED
+%s DQUOTED
 %%
 
-\s+                                   return 'WHITE'
+(\\.)                                 return 'ESCAPE'
+
+<INITIAL>"'"                          { this.begin('QUOTED'); return 'QUOTE' }
+<QUOTED>[^\\\']+                      { return 'STRING' }
+<QUOTED>"'"                           { this.begin('INITIAL'); return 'QUOTE' }
+
+<INITIAL>"\""                         { this.begin('DQUOTED'); return 'DQUOTE' }
+<DQUOTED>[^\\\"]+                     { return 'STRING' }
+<DQUOTED>"\""                         { this.begin('INITIAL'); return 'DQUOTE' }
+
+\s+                                   /* ignore whitespace */
 true|false|TRUE|FALSE                 return 'BOOLEAN'
 AND|and                               return 'AND'
 OR|or                                 return 'OR'
 NOT|not                               return 'NOT'
 [0-9]+("."[0-9]+)?\b|("."[0-9]+)\b    return 'NUMBER'
-[a-zA-Z]+                             return 'NAME'
+[a-zA-Z][a-zA-Z0-9_"."\s]+            return 'NAME'
 \@[a-zA-Z]+                           return 'COLUMN'
 "*"                                   return '*'
 "/"                                   return '/'
@@ -29,10 +38,6 @@ NOT|not                               return 'NOT'
 "["                                   return '['
 "]"                                   return ']'
 ","                                   return ','
-"'"                                   return 'QUOTE'
-"\""                                  return 'DQUOTE'
-"\\."                                 return 'ESCAPE'
-[^"']+                                return 'STRING'
 <<EOF>>                               return 'EOF'
 .                                     return 'INVALID'
 
@@ -67,8 +72,17 @@ e
     | boolExp                { $$ = $1; }
     | '(' e ')'              { $$ = $2; }
     | '[' array ']'          { $$ = $2; }
-    | WHITE e                { $$ = $2; }
-    | e WHITE                { $$ = $1; }
+    | string                 { $$ = $1; }
+    ;
+
+string
+    : DQUOTE stringWithEscapes DQUOTE   { $$ = () => $2; }
+    | QUOTE stringWithEscapes QUOTE     { $$ = () => $2; }
+    ;
+
+stringWithEscapes
+    : stringWithEscapes ESCAPE STRING    { $$ = $1 + $2.substring(1) + $3; }
+    | STRING
     ;
 
 array
@@ -84,6 +98,4 @@ boolExp
     | NOT boolExp            { $$ = () => !$2();        }
     | e '=' e                { $$ = () => $1() == $3(); }
     | e '!=' e               { $$ = () => $1() != $3(); }
-    | WHITE boolExp          { $$ = $2; }
-    | boolExp WHITE          { $$ = $1; }
     ;

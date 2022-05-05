@@ -72,6 +72,11 @@ describe.each([
       ["array", "[1,2,3]", [1,2,3], null],
       ["array, with spaces", "[ 1 , 2 , 3 ]", [1,2,3], null],
       ["string", '"string"', "string", null],
+      ["string, with spaces", '"string with spaces"', "string with spaces", null],
+      ["string, with symbols", '"string with! @symbols"', "string with! @symbols", null],
+      ["string, double quotes", '"string with! @symbols"', "string with! @symbols", null],
+      ["string, single quotes", "'string with! @symbols'", "string with! @symbols", null],
+      ["string, escaped quotes", "'string \\\'with! @symbols'", "string 'with! @symbols", null]
    ])('%s', runTest);
 });
 
@@ -117,17 +122,17 @@ describe.each([
 ])('%s', () => {
    test.each([
       [
-         "function call, choice, match found",
+         "choice, match found",
          "choice([1, true, false],[111,222,333], 444)",
          222, null
       ],
       [
-         "function call, choice, default",
-         "choice([1, undef, false],[111,222,333], 444)",
-         444, null
+         "choice, default value",
+         'choice([1, undef, false],[111,222,333], "someth\\\"ing")',
+         'someth"ing', null
       ],
-      ["function call mean of array", "mean([1,2,4])", 2.3333333333333335, null],
-      ["function call, mean of column", "mean(@hello)", 6234, null],
+      ["mean of array", "mean([1,2,4])", 2.3333333333333335, null],
+      ["mean of column", "mean(@hello)", 6234, null],
    ])('%s, %s', runTest);
 });
 
