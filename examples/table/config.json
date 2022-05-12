@@ -5,20 +5,23 @@
             "data": "data.csv",
             "output": "output.svg",
             "sort": "score",
-            "elements": [{
+            "groups": [{
                 "id": "DataRow",
                 "spacing": {
                     "x": 0,
                     "y": 53
                 },
-                "rules": [
-                    { "id": "Product", "text":    "Product" },
-                    { "id": "Price",   "width":   "1.3 * Price" },
-                    { "id": "Rating",  "width":   "1.3 * Rating", "fill":  "choice([Rating<=33, Rating<=66], ['red','amber','green'])" },
-                    { "id": "Up",      "include": "PriceChange=='up'" },
-                    { "id": "Down",    "include": "PriceChange=='down'" },
-                    { "id": "Value",   "width":   "Price/mean(Price_column) * Rating/mean(Rating_column)" }
-                ]
+                "rules": {
+                    "Product": { "text":    "Product" },
+                    "Price":   { "width":   "1.3 * Price" },
+                    "Up":      { "include": "PriceChange=='up'" },
+                    "Down":    { "include": "PriceChange=='down'" },
+                    "Value":   { "width":   "Price/mean(Price_column) * Rating/mean(Rating_column)" },
+                    "Rating":  {
+                        "width":   "1.3 * Rating",
+                        "fill":  "choice([Rating<=33, Rating<=66], ['red','amber'], 'green')"
+                    }
+                }
             }]
         }
     ]

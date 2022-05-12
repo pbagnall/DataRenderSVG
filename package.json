@@ -16,14 +16,15 @@
   "dependencies": {
     "@xmldom/xmldom": "^0.8.2",
     "csv-parse": "^5.0.4",
-    "process": "^0.11.10"
+    "process": "^0.11.10",
+    "xpath": "^0.0.32"
   },
   "devDependencies": {
     "@babel/core": "^7.14.3",
     "@babel/preset-env": "^7.14.4",
+    "@jest/globals": "^28.0.3",
     "babel-jest": "^28.0.3",
     "jest": "^28.0.3",
-    "@jest/globals": "^28.0.3",
     "jison": "^0.4.18"
   }
 }

@@ -1,6 +1,8 @@
 import fs from "fs";
 import { parse } from "csv-parse/sync";
 import xmldom from "@xmldom/xmldom";
+import xpath from 'xpath';
+import parser from "../grammar/parser.js";
 
 const { DOMParser, XMLSerializer } = xmldom;
 
@@ -24,53 +26,66 @@ export default class SvgJob {
       this.outputPath = job.output;
       this.data = job.data;
       this.sort = job.sort;
-      this.elements = job.elements;
+      this.groups = job.groups;
    }
 
    run() {
-      for (let element of this.elements) {
-         this.buildElement(element);
+      for (let group of this.groups) {
+         this.buildElement(group);
       }
       this.saveSVG();
    }
 
-   buildElement(element) {
-      this.template = this.templateSVG.getElementById(element.id);
+   buildElement(group) {
+      this.template = this.templateSVG.getElementById(group.id);
       this.target = this.outputSVG.documentElement;
-      let spacing = { x: element.spacing.x, y: element.spacing.y };
+      let spacing = { x: group.spacing.x, y: group.spacing.y };
       let serial = 1;
       let position = { x:0, y: 0 };
 
-      for (let data of this.dataset) {
-         let copy = this.templateSVG.importNode(this.template, true);
-         let id = copy.getAttribute("id");
-         copy.setAttribute("id", id+serial);
-         copy.setAttribute("transform", `translate(${position.x}, ${position.y})`);
-         this.applyData(data, copy);
-         this.target.appendChild(copy);
-         serial++;
+      this.compileExpressions(group.rules);
 
+      for (let row of this.dataset) {
+         let templateCopy = this.outputSVG.importNode(this.template, true);
+         let id = templateCopy.getAttribute("id");
+         templateCopy.setAttribute("id", id+""+serial);
+         templateCopy.setAttribute("transform", `translate(${position.x}, ${position.y})`);
+
+         this.target.appendChild(templateCopy);
+         this.target.appendChild(this.outputSVG.createTextNode("\n"));
+         this.applyData(group.rules, templateCopy, this.dataset, row, serial);
+
+         serial++;
          position.x += spacing.x;
          position.y += spacing.y;
       }
    }
 
-   applyData(data, group, serial) {
+   compileExpressions(rules) {
 
    }
 
-   populateTemplate(data) {
-      let elements = new Set();
-      for (let label in data) {
-         let [id, attr] = label.split(':');
-         let element = this.template.getElementById(id);
-         elements.add(element);
-         if (attr==='text') {
-            if (element.firstChild.nodeType === 3) {
-               element.replaceChild(this.template.createTextNode(data[label]), element.firstChild);
+   applyData(rules, copyElement, data, row, serial) {
+      let ruleEntries = Object.entries(rules);
+
+      for (let idRuleMap of ruleEntries) {
+         let [id, rule] = idRuleMap;
+         let xPathRule = `//*[@id='${id}']`;
+
+         let xpathResult = xpath.evaluate(xPathRule, copyElement, null, xpath.XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+         let element = xpathResult.singleNodeValue;
+         if (element) {
+            element.setAttribute('id', element.getAttribute('id') + "" + serial);
+
+            for (let [attr, expr] of Object.entries(rule)) {
+               if (attr==='text') {
+                  if (element.firstChild.nodeType === 3) {
+                     element.replaceChild(this.outputSVG.createTextNode(expr), element.firstChild);
+                  }
+               } else {
+                  element.setAttribute(attr, expr);
+               }
             }
-         } else {
-            element.setAttribute(attr, data[label]);
          }
       }
    }
