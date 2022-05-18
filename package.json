@@ -8,13 +8,23 @@
     "renderdata": "./bin/index.js"
   },
   "scripts": {
+    "build": "node grammar/buildParser.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Pete Bagnall",
   "license": "ISC",
   "dependencies": {
-    "@xmldom/xmldom": "^0.8.0",
+    "@xmldom/xmldom": "^0.8.2",
     "csv-parse": "^5.0.4",
-    "jsdom": "^19.0.0"
+    "process": "^0.11.10",
+    "xpath": "^0.0.32"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.3",
+    "@babel/preset-env": "^7.14.4",
+    "@jest/globals": "^28.0.3",
+    "babel-jest": "^28.0.3",
+    "jest": "^28.0.3",
+    "jison": "^0.4.18"
   }
 }

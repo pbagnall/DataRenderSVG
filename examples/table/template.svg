@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1176px" height="1200px" viewBox="0 0 1176 1200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="DataRow">
+        <text id="Product" text-decoration="underline" x="20" y="18" font-family="OpenSans, Open Sans" font-size="16" font-weight="normal" fill="#01518A">Supplier</text>
+        <rect id="Value" fill="#146615" x="148" y="0" width="44" height="24" rx="4"/>
+        <text id="ValueText" x="199.296875" y="18" text-anchor='end' fill="#000000" font-family="OpenSans, Open Sans" font-size="16" font-weight="normal">Score</text>
+        <rect id="Price" fill="#00518A" x="248" y="6" width="32" height="12"/>
+        <rect id="Rating" fill="#00518A" x="348" y="6" width="32" height="12"/>
+    </g>
+</svg>

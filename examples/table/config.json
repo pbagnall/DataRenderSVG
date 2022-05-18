@@ -1,0 +1,29 @@
+{
+    "jobs": [
+        {
+            "template": "template.svg",
+            "data": "data.csv",
+            "output": "output.svg",
+            "sort": "score",
+            "groups": [{
+                "id": "DataRow",
+                "spacing": {
+                    "x": 0,
+                    "y": 53
+                },
+                "rules": {
+                    "Product": { "text":    "Product" },
+                    "Price":   { "width":   "1.3 * Price" },
+                    "Up":      { "include": "PriceChange='up'" },
+                    "Down":    { "include": "PriceChange='down'" },
+                    "Value":   { "width":   "dp(Price/mean(@Price) * Rating/mean(@Rating) * 100, 2)" },
+                    "ValueText":   { "text":   "dp(Price/mean(@Price) * Rating/mean(@Rating) * 100, 2)" },
+                    "Rating":  {
+                        "width":   "1.3 * Rating",
+                        "fill":  "choice([Rating<=33, Rating<=66], ['red','orange'], 'green')"
+                    }
+                }
+            }]
+        }
+    ]
+}
