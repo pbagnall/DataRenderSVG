@@ -25,14 +25,20 @@ NOT|not                               return 'NOT'
 [0-9]+("."[0-9]+)?\b|("."[0-9]+)\b    return 'NUMBER'
 [a-zA-Z][a-zA-Z0-9_"."\s]+            return 'NAME'
 \@[a-zA-Z]+                           return 'COLUMN'
+
 "*"                                   return '*'
 "/"                                   return '/'
 "-"                                   return '-'
 "+"                                   return '+'
 "^"                                   return '^'
+
 "!="                                  return '!='
 "="                                   return '='
-"%"                                   return '%'
+"<="                                  return '<='
+">="                                  return '>='
+"<"                                   return '<'
+">"                                   return '>'
+
 "("                                   return '('
 ")"                                   return ')'
 "["                                   return '['
@@ -98,4 +104,8 @@ boolExp
     | NOT boolExp            { $$ = () => !$2();        }
     | e '=' e                { $$ = () => $1() == $3(); }
     | e '!=' e               { $$ = () => $1() != $3(); }
+    | e '<=' e               { $$ = () => $1() <= $3(); }
+    | e '>=' e               { $$ = () => $1() >= $3(); }
+    | e '<' e                { $$ = () => $1() < $3(); }
+    | e '>' e                { $$ = () => $1() > $3(); }
     ;

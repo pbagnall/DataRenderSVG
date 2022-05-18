@@ -2,15 +2,13 @@ import fs from "fs";
 import { parse } from "csv-parse/sync";
 import xmldom from "@xmldom/xmldom";
 import xpath from 'xpath';
-import parser from "../grammar/parser.js";
+import Formula from "./Formula.js";
 
 const { DOMParser, XMLSerializer } = xmldom;
 
 export default class SvgJob {
    constructor(job) {
       let parser = new DOMParser();
-      console.log(job.template);
-
       let templateString = fs.readFileSync(job.template).toString();
       this.templateSVG = parser.parseFromString(templateString);
 
@@ -19,7 +17,6 @@ export default class SvgJob {
 <svg width="1176px" height="1200px" viewBox="0 0 1176 1200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 </svg>`.trim());
 
-      console.log(job.data);
       let csv = fs.readFileSync(job.data).toString();
       this.dataset = parse(csv, {columns: true});
 
@@ -27,6 +24,8 @@ export default class SvgJob {
       this.data = job.data;
       this.sort = job.sort;
       this.groups = job.groups;
+
+      this.setup
    }
 
    run() {
@@ -43,7 +42,7 @@ export default class SvgJob {
       let serial = 1;
       let position = { x:0, y: 0 };
 
-      this.compileExpressions(group.rules);
+      let functions = this.compileExpressions(group.rules);
 
       for (let row of this.dataset) {
          let templateCopy = this.outputSVG.importNode(this.template, true);
@@ -53,7 +52,7 @@ export default class SvgJob {
 
          this.target.appendChild(templateCopy);
          this.target.appendChild(this.outputSVG.createTextNode("\n"));
-         this.applyData(group.rules, templateCopy, this.dataset, row, serial);
+         this.applyData(functions, templateCopy, this.dataset, row, serial);
 
          serial++;
          position.x += spacing.x;
@@ -62,7 +61,20 @@ export default class SvgJob {
    }
 
    compileExpressions(rules) {
+      let functions = {};
+      for (let element in rules) {
+         functions[element] = {};
+         for (let attr in rules[element]) {
+            functions[element][attr] = new Formula(rules[element][attr]);
+         }
 
+         // elements should be included, unless the include attribute is overridden
+         if (typeof functions[element].include === 'undefined') {
+            functions[element].include = new Formula('true');
+         }
+      }
+
+      return functions;
    }
 
    applyData(rules, copyElement, data, row, serial) {
@@ -77,13 +89,26 @@ export default class SvgJob {
          if (element) {
             element.setAttribute('id', element.getAttribute('id') + "" + serial);
 
-            for (let [attr, expr] of Object.entries(rule)) {
-               if (attr==='text') {
-                  if (element.firstChild.nodeType === 3) {
-                     element.replaceChild(this.outputSVG.createTextNode(expr), element.firstChild);
-                  }
+            for (let [attr, formula] of Object.entries(rule)) {
+               let value = formula.evaluate(row, data);
+               console.log(id, attr, value);
+
+               if (attr === 'include' && value === false) {
+                  element.parentElement.removeChild(element);
+                  break;
                } else {
-                  element.setAttribute(attr, expr);
+                  switch (attr) {
+                     case 'text':
+                        if (element.firstChild.nodeType === 3) {
+                           element.replaceChild(this.outputSVG.createTextNode(value), element.firstChild);
+                        }
+                        break;
+                     case 'include':
+                        break;
+                     default:
+                        element.setAttribute(attr, value);
+                        break;
+                  }
                }
             }
          }
