@@ -31,6 +31,30 @@ function mean(data) {
    return sum / data.length;
 }
 
+function sum(data) {
+   let sum = 0;
+   for (let datum of data) {
+      sum += parseFloat(datum);
+   }
+   return sum;
+}
+
+function max(data) {
+   let max = Number.NEGATIVE_INFINITY;
+   for (let datum of data) {
+      max = max < datum ? datam : max;
+   }
+   return max;
+}
+
+function min(data) {
+   let max = Number.POSITIVE_INFINITY;
+   for (let datum of data) {
+      max = max > datum ? datam : max;
+   }
+   return max;
+}
+
 /**
  * returns a string representation of a float to x decimal places.
  */
@@ -41,7 +65,10 @@ function dp(num, places) {
 parser.yy.functions = {
    choice: choice,
    mean: mean,
-   dp: dp
+   dp: dp,
+   sum: sum,
+   min: min,
+   max: max
 };
 
 export default class Formula {
