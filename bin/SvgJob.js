@@ -24,8 +24,6 @@ export default class SvgJob {
       this.data = job.data;
       this.sort = job.sort;
       this.groups = job.groups;
-
-      this.setup
    }
 
    run() {
@@ -60,28 +58,40 @@ export default class SvgJob {
       }
    }
 
+   /**
+    *
+    * @param rules
+    * @returns {Map<string, Map<string, Formula>>}
+    */
    compileExpressions(rules) {
-      let functions = {};
+      const ruleMap = new Map();
       for (let element in rules) {
-         functions[element] = {};
+         const idMap = new Map();
+         ruleMap.set(element, idMap);
+
          for (let attr in rules[element]) {
-            functions[element][attr] = new Formula(rules[element][attr]);
+            idMap.set(attr, new Formula(rules[element][attr]));
          }
 
          // elements should be included, unless the include attribute is overridden
-         if (typeof functions[element].include === 'undefined') {
-            functions[element].include = new Formula('true');
+         if (!idMap.has('include')) {
+            idMap.set('include', new Formula('true'));
          }
       }
 
-      return functions;
+      return ruleMap;
    }
 
+   /**
+    *
+    * @param rules {Map<string, Map<string, Formula>>}
+    * @param copyElement {Element}
+    * @param data {[{}]}
+    * @param row {{}}
+    * @param serial {int}
+    */
    applyData(rules, copyElement, data, row, serial) {
-      let ruleEntries = Object.entries(rules);
-
-      for (let idRuleMap of ruleEntries) {
-         let [id, rule] = idRuleMap;
+      for (let [id, rule] of rules.entries()) {
          let xPathRule = `//*[@id='${id}']`;
 
          let xpathResult = xpath.evaluate(xPathRule, copyElement, null, xpath.XPathResult.FIRST_ORDERED_NODE_TYPE, null);
@@ -89,9 +99,8 @@ export default class SvgJob {
          if (element) {
             element.setAttribute('id', element.getAttribute('id') + "" + serial);
 
-            for (let [attr, formula] of Object.entries(rule)) {
+            for (let [attr, formula] of rule.entries()) {
                let value = formula.evaluate(row, data);
-               console.log(id, attr, value);
 
                if (attr === 'include' && value === false) {
                   element.parentElement.removeChild(element);
